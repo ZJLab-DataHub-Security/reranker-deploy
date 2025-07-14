@@ -12,9 +12,9 @@ from fastapi.responses import JSONResponse, Response
 import asyncio
 import aiohttp
 
-model_dir = "/nas/zhangjinxin/reranker_service/bge-reranker-v2-m3"
+model_dir = "./bge-reranker-v2-m3"
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 app = FastAPI()
 reranker = FlagReranker(model_dir, use_fp16=True)
@@ -61,7 +61,7 @@ async def heartbeat():
     while True:
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get("http://127.0.0.1:8566/health") as response:
+                async with session.get("http://127.0.0.1:8000/health") as response:
                     if response.status == 200:
                         logging.info("心跳检测成功")
                     else:
@@ -76,6 +76,6 @@ async def startup_event():
     asyncio.create_task(heartbeat())
 
 if __name__ == '__main__':
-    uvicorn.run(app=app, host="0.0.0.0", port=8566)
+    uvicorn.run(app=app, host="0.0.0.0", port=8000)
     # 注意：如果供其他电脑调用需要改为 "0.0.0.0"，另外需要关闭电脑的防火墙
 
